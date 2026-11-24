@@ -1,9 +1,9 @@
 {
   "mcpServers": {
-    "multiplayr": {
+    "weclaude": {
       "command": "bash",
-      "args": ["${PLUGIN_ROOT}/bin/multiplayr", "mcp"],
-      "env": { "MULTIPLAYR_PLATFORM": "ANTIGRAVITY" }
+      "args": ["${PLUGIN_ROOT}/bin/weclaude", "mcp"],
+      "env": { "WECLAUDE_PLATFORM": "ANTIGRAVITY" }
     }
   }
 }

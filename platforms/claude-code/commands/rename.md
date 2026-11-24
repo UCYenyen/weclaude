@@ -1,9 +1,9 @@
 ---
-description: Rename this session's Multiplayr agent
+description: Rename this session's Weclaude agent
 argument-hint: <name>
-allowed-tools: Bash(multiplayr:*), Bash(~/.local/bin/multiplayr:*)
+allowed-tools: Bash(weclaude:*), Bash(~/.local/bin/weclaude:*)
 ---
 
-Run `multiplayr rename "$ARGUMENTS"` and show its output.
+Run `weclaude rename "$ARGUMENTS"` and show its output.
 
-If `multiplayr` is not on PATH, use `~/.local/bin/multiplayr`.
+If `weclaude` is not on PATH, use `~/.local/bin/weclaude`.

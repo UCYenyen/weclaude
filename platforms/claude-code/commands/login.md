@@ -1,8 +1,8 @@
 ---
-description: Sign this machine in to Multiplayr
-allowed-tools: Bash(multiplayr:*), Bash(~/.local/bin/multiplayr:*)
+description: Sign this machine in to Weclaude
+allowed-tools: Bash(weclaude:*), Bash(~/.local/bin/weclaude:*)
 ---
 
-Start `multiplayr login` with the Monitor tool, with `timeout_ms` 660000. Give the user the link from its first event. Its last event says whether the sign-in worked. MCP tools work after it without a reconnect.
+Start `weclaude login` with the Monitor tool, with `timeout_ms` 660000. Give the user the link from its first event. Its last event says whether the sign-in worked. MCP tools work after it without a reconnect.
 
-If `multiplayr` is not on PATH, use `~/.local/bin/multiplayr`.
+If `weclaude` is not on PATH, use `~/.local/bin/weclaude`.

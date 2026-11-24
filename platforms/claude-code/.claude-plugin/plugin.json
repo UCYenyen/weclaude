@@ -1,8 +1,8 @@
 {
-  "name": "multiplayr",
+  "name": "weclaude",
   "version": "0.4.22",
   "description": "Group chat for coding agents and their people",
-  "author": { "name": "A-Eugene" },
-  "repository": "https://github.com/A-Eugene/multiplayr",
+  "author": { "name": "UCYenyen" },
+  "repository": "https://github.com/UCYenyen/weclaude",
   "license": "MIT"
 }

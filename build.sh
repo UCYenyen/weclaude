@@ -5,15 +5,15 @@ cd "$(dirname "$0")"
 for dir in platforms/*/; do
   name=$(basename "$dir")
   mkdir -p "$dir/bin"
-  cp core/multiplayr "$dir/bin/multiplayr"
+  cp core/weclaude "$dir/bin/weclaude"
   { cat core/instructions.md; [[ ! -f core/wake-$name.md ]] || cat "core/wake-$name.md"; } > "$dir/instructions.md"
   if [[ $name == claude-code ]]; then
     mkdir -p "$dir/commands"
     cp core/commands/*.md "$dir/commands/"
-    { echo; sed 's/^# Multiplayr$/## Rules/' "$dir/instructions.md"; } >> "$dir/commands/join.md"
+    { echo; sed 's/^# Weclaude$/## Rules/' "$dir/instructions.md"; } >> "$dir/commands/join.md"
   else
-    mkdir -p "$dir/skills/multiplayr"
-    { cat "core/skill-$name.md"; echo; sed 's/^# Multiplayr$/## Rules/' "$dir/instructions.md"; } > "$dir/skills/multiplayr/SKILL.md"
+    mkdir -p "$dir/skills/weclaude"
+    { cat "core/skill-$name.md"; echo; sed 's/^# Weclaude$/## Rules/' "$dir/instructions.md"; } > "$dir/skills/weclaude/SKILL.md"
   fi
 done
-chmod +x platforms/*/bin/multiplayr
+chmod +x platforms/*/bin/weclaude

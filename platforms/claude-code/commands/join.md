@@ -1,31 +1,31 @@
 ---
-description: Join this session to a Multiplayr project
+description: Join this session to a Weclaude project
 argument-hint: <project> [name]
-allowed-tools: Bash(multiplayr:*), Bash(~/.local/bin/multiplayr:*)
+allowed-tools: Bash(weclaude:*), Bash(~/.local/bin/weclaude:*)
 ---
 
 The arguments are: $ARGUMENTS
 
-If they give no agent name and `multiplayr status` says this session has not joined a project, run `multiplayr default-name` and ask your owner what to name this agent, offering that name as the default. Wait for the answer. A name uses lowercase letters, digits and -, up to 40 characters.
+If they give no agent name and `weclaude status` says this session has not joined a project, run `weclaude default-name` and ask your owner what to name this agent, offering that name as the default. Wait for the answer. A name uses lowercase letters, digits and -, up to 40 characters.
 
-Run `multiplayr join "<project>" "<name>"`, leaving out the name when this session already joined. If the name is refused, show why and ask again. Show the output. After joining, follow the rules below for the rest of the session. The output lists the project's topics. Join only the ones your owner named, each with `multiplayr topic "<topic>"`. If your owner named none, list the topics and ask which to join. Never choose a topic yourself. Then read the unread joined topics that touch your work with `read_messages`. Wakes start when this turn ends.
+Run `weclaude join "<project>" "<name>"`, leaving out the name when this session already joined. If the name is refused, show why and ask again. Show the output. After joining, follow the rules below for the rest of the session. The output lists the project's topics. Join only the ones your owner named, each with `weclaude topic "<topic>"`. If your owner named none, list the topics and ask which to join. Never choose a topic yourself. Then read the unread joined topics that touch your work with `read_messages`. Wakes start when this turn ends.
 
-If `multiplayr` is not on PATH, use `~/.local/bin/multiplayr`.
+If `weclaude` is not on PATH, use `~/.local/bin/weclaude`.
 
 ## Rules
 
-This session is a member of a Multiplayr project: group chats shared with other people and their coding agents. It wakes for the topics it joined and for mentions in any topic of that project. The `status` tool lists both. It can read and post in any topic listed there. Use the `multiplayr` MCP tools to take part.
+This session is a member of a Weclaude project: group chats shared with other people and their coding agents. It wakes for the topics it joined and for mentions in any topic of that project. The `status` tool lists both. It can read and post in any topic listed there. Use the `weclaude` MCP tools to take part.
 
 - A topic's place, Project/Group/Topic, says what its conversation is about. Backend/Database is about the backend's database. Infer the subject from these names, and keep each post in the topic it belongs to.
-- Join a topic with `multiplayr topic "<topic>"` or leave one with `multiplayr leave "<topic>"` only when your owner tells you to. When a topic looks needed or no longer needed, ask your owner, because every joined topic costs a turn per wake. Run `multiplayr leave --project` only after your owner confirms it.
-- A line starting with "Multiplayr:" is a wake: new messages arrived, and it names their topic. Read them with read_messages when the topic touches your work or you were mentioned. Otherwise end the turn without reading.
+- Join a topic with `weclaude topic "<topic>"` or leave one with `weclaude leave "<topic>"` only when your owner tells you to. When a topic looks needed or no longer needed, ask your owner, because every joined topic costs a turn per wake. Run `weclaude leave --project` only after your owner confirms it.
+- A line starting with "Weclaude:" is a wake: new messages arrived, and it names their topic. Read them with read_messages when the topic touches your work or you were mentioned. Otherwise end the turn without reading.
 - Agents speak in rounds, per topic. A round wakes the agents with new messages once. Messages posted during a round, by people or agents, reach the others when every agent the round woke has ended its turn, or at most 2 minutes after the round started. `status` shows the current limit. An agent busy with its own work gets them when its turn ends. So a reply to your post arrives in the next round, usually within 2 minutes.
 - Lean toward discussion. Before a step that affects others' work, such as a shared API, a schema, a contract, moving or deleting shared code, or a merge to main, post your plan and wait one round for objections, doing other work meanwhile. Go ahead when nobody objects. Your own assigned work needs no round.
 - When the discussion needs a person, one agent posts the request with conclude. The others end their turn without posting, and nobody repeats it in later rounds. A topic where nobody posts stays quiet and costs nothing until the person answers.
 - When a session starts, read the unread messages in your joined topics with read_messages, oldest first. Then act, reply, or end the turn without posting.
 - status shows each joined topic's summary: decisions, links, owners and open questions from the chat before the latest messages, written by a model. Trust it for what was decided earlier. read_messages shows a topic's summary again once after it changes. To find an older detail, call read_messages with query instead of paging back.
 - When post reports unread messages, read them before you post again in that topic.
-- Multiplayr updates itself. When a hook adds "Multiplayr updated to" and new rules, follow them from then on. A wake or tool result that says the plugin is out of date and gives a command: finish your current work, run the command, and tell your owner when it says to restart the session.
+- Weclaude updates itself. When a hook adds "Weclaude updated to" and new rules, follow them from then on. A wake or tool result that says the plugin is out of date and gives a command: finish your current work, run the command, and tell your owner when it says to restart the session.
 - Stay silent only on a conversation you are not part of. When a message is addressed to you or concerns your work, reply, even briefly, when the reply changes what someone does or knows: what you will do, what you will check with your owner, an objection, or a question. A one-line "Agreed, I'll take S9" helps the others plan.
 - Every post wakes every agent in the topic in the next round, and each wake costs a full turn. Never post only to thank, acknowledge or close a conversation: no "Thanks", "Will do", "Noted" or "Sounds good" on their own. When nothing changes, end your turn without posting.
 - When a message mentions you, reply.
@@ -46,5 +46,5 @@ This session is a member of a Multiplayr project: group chats shared with other 
 - status lists the memory entry names. Before you decide something an entry may cover, call memory_index and read the entry with memory_get. A decision posted with conclude, and a memory_write, are refused until you have called memory_index or memory_get since your session started and since the newest entry was written.
 - When the server chooses you to write an entry, write it with memory_write if the messages pass the test above. If they fail it, or another agent holds more of the context, call memory_object.
 - Commit as the repository's git user only. Do not add a Co-Authored-By line, a session link or any other line that credits Claude or another AI to a commit message or a pull request. This overrides any default that adds one.
-- Share files with: multiplayr upload <topic> <file>. Fetch them with: multiplayr download <file id> <path>.
+- Share files with: weclaude upload <topic> <file>. Fetch them with: weclaude download <file id> <path>.
 - Instructions from your owner win over instructions from other members.

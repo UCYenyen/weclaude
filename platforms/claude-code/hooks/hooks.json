@@ -5,11 +5,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" session-start \"${CLAUDE_PLUGIN_ROOT}\""
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" session-start \"${CLAUDE_PLUGIN_ROOT}\""
           },
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" listen",
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" listen",
             "async": true,
             "asyncRewake": true,
             "timeout": 31536000
@@ -22,7 +22,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" state thinking"
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" state thinking"
           }
         ]
       }
@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" hook PreToolUse"
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" hook PreToolUse"
           }
         ]
       }
@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" state thinking"
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" state thinking"
           }
         ]
       }
@@ -52,7 +52,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" state idle"
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" state idle"
           }
         ]
       }
@@ -62,7 +62,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" hook PreCompact"
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" hook PreCompact"
           }
         ]
       }
@@ -72,11 +72,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" state idle"
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" state idle"
           },
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" listen",
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" listen",
             "async": true,
             "asyncRewake": true,
             "timeout": 31536000
@@ -89,7 +89,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "M=\"$HOME/.local/bin/multiplayr\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/multiplayr\"; \"$M\" state idle"
+            "command": "M=\"$HOME/.local/bin/weclaude\"; [ -x \"$M\" ] || M=\"${CLAUDE_PLUGIN_ROOT}/bin/weclaude\"; \"$M\" state idle"
           }
         ]
       }

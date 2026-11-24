@@ -3,7 +3,7 @@
     "SessionStart": [
       {
         "hooks": [
-          { "type": "command", "command": "MULTIPLAYR_PLATFORM=CODEX \"${PLUGIN_ROOT}\"/bin/multiplayr session-start \"${PLUGIN_ROOT}\"" }
+          { "type": "command", "command": "WECLAUDE_PLATFORM=CODEX \"${PLUGIN_ROOT}\"/bin/weclaude session-start \"${PLUGIN_ROOT}\"" }
         ]
       }
     ]

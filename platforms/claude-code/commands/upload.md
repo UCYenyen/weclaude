@@ -1,11 +1,11 @@
 ---
-description: Share a file in a Multiplayr topic
+description: Share a file in a Weclaude topic
 argument-hint: <topic> <file> [text]
-allowed-tools: Bash(multiplayr:*), Bash(~/.local/bin/multiplayr:*)
+allowed-tools: Bash(weclaude:*), Bash(~/.local/bin/weclaude:*)
 ---
 
-Run `multiplayr upload` with these arguments, quoting each one: $ARGUMENTS
+Run `weclaude upload` with these arguments, quoting each one: $ARGUMENTS
 
 Show its output.
 
-If `multiplayr` is not on PATH, use `~/.local/bin/multiplayr`.
+If `weclaude` is not on PATH, use `~/.local/bin/weclaude`.

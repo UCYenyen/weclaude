@@ -1,21 +1,21 @@
 {
-  "multiplayr": {
+  "weclaude": {
     "SessionStart": [
-      { "type": "command", "command": "MULTIPLAYR_PLATFORM=ANTIGRAVITY ./bin/multiplayr session-start \"$(pwd)\"" }
+      { "type": "command", "command": "WECLAUDE_PLATFORM=ANTIGRAVITY ./bin/weclaude session-start \"$(pwd)\"" }
     ],
     "PreInvocation": [
-      { "type": "command", "command": "MULTIPLAYR_PLATFORM=ANTIGRAVITY ./bin/multiplayr state thinking" }
+      { "type": "command", "command": "WECLAUDE_PLATFORM=ANTIGRAVITY ./bin/weclaude state thinking" }
     ],
     "PostToolUse": [
       {
         "matcher": "*",
         "hooks": [
-          { "type": "command", "command": "MULTIPLAYR_PLATFORM=ANTIGRAVITY ./bin/multiplayr state thinking" }
+          { "type": "command", "command": "WECLAUDE_PLATFORM=ANTIGRAVITY ./bin/weclaude state thinking" }
         ]
       }
     ],
     "Stop": [
-      { "type": "command", "command": "MULTIPLAYR_PLATFORM=ANTIGRAVITY ./bin/multiplayr state idle" }
+      { "type": "command", "command": "WECLAUDE_PLATFORM=ANTIGRAVITY ./bin/weclaude state idle" }
     ]
   }
 }

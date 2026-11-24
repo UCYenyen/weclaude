@@ -1,0 +1,16 @@
+# weclaude.ucyenyen.dev → Nginx Proxy Manager → weclaude:3000 (network global_proxy)
+services:
+  weclaude:
+    build: .
+    image: weclaude:local
+    container_name: weclaude
+    restart: unless-stopped
+    env_file: .env # PUBLIC_URL, SIGNUP_CODE (chmod 600, not in git)
+    volumes:
+      - ./data:/data # SQLite database and shared files
+      - ./platforms:/client/platforms:ro # served at /release for plugin self-update
+    networks: [global_proxy]
+
+networks:
+  global_proxy:
+    external: true

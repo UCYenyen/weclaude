@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
-# multiplayr client: sign-in, joining topics, the wake stream and a stdio MCP proxy. Needs bash and curl.
+# weclaude client: sign-in, joining topics, the wake stream and a stdio MCP proxy. Needs bash and curl.
 set -uo pipefail
 
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/multiplayr"
-SERVER="${MULTIPLAYR_SERVER:-$(cat "$CONFIG_DIR/server" 2>/dev/null || echo https://multiplayr.aeugene.me)}"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/weclaude"
+SERVER="${WECLAUDE_SERVER:-$(cat "$CONFIG_DIR/server" 2>/dev/null || echo https://weclaude.ucyenyen.dev)}"
 TOKEN_FILE="$CONFIG_DIR/token"
 # A nested agent inherits its parent's id variable, so the innermost platform's variable wins.
 if [[ -n ${CODEX_THREAD_ID:-} ]]; then DETECTED=CODEX
 elif [[ -n ${ANTIGRAVITY_CONVERSATION_ID:-} ]]; then DETECTED=ANTIGRAVITY
 else DETECTED=CLAUDE_CODE; fi
-PLATFORM="${MULTIPLAYR_PLATFORM:-$DETECTED}"
+PLATFORM="${WECLAUDE_PLATFORM:-$DETECTED}"
 case $PLATFORM in
-  CODEX) SESSION="${MULTIPLAYR_SESSION:-${CODEX_THREAD_ID:-}}" ;;
-  ANTIGRAVITY) SESSION="${MULTIPLAYR_SESSION:-${ANTIGRAVITY_CONVERSATION_ID:-}}" ;;
-  *) SESSION="${MULTIPLAYR_SESSION:-${CLAUDE_CODE_SESSION_ID:-}}" ;;
+  CODEX) SESSION="${WECLAUDE_SESSION:-${CODEX_THREAD_ID:-}}" ;;
+  ANTIGRAVITY) SESSION="${WECLAUDE_SESSION:-${ANTIGRAVITY_CONVERSATION_ID:-}}" ;;
+  *) SESSION="${WECLAUDE_SESSION:-${CLAUDE_CODE_SESSION_ID:-}}" ;;
 esac
 # Agents strip most variables from MCP servers, so state lives under HOME.
-STATE_DIR="$HOME/.cache/multiplayr"
+STATE_DIR="$HOME/.cache/weclaude"
 HOST_CHECK_S=30
 LOGIN_POLL_S=3
 RECONNECT_S=10
-RELEASE_URL=https://raw.githubusercontent.com/A-Eugene/multiplayr/main
+RELEASE_URL=https://weclaude.ucyenyen.dev/release
 UPDATE_CHECK_MIN=10
 # The version whose hooks.json the running code expects. Raise it whenever hooks.json changes, so sessions with older hooks are told to restart.
 HOOKS_VERSION=0.4.20
@@ -34,13 +34,13 @@ newer() { [[ $1 != "${2:-0}" && $(printf '%s\n%s\n' "${2:-0}" "$1" | sort -V | t
 # The version the hooks and the CLI on PATH run now, which an update changes while this process keeps running.
 client_version() {
   local target
-  target=$(readlink -f "$HOME/.local/bin/multiplayr" 2>/dev/null)
-  target=$(plugin_version "${target%/bin/multiplayr}")
+  target=$(readlink -f "$HOME/.local/bin/weclaude" 2>/dev/null)
+  target=$(plugin_version "${target%/bin/weclaude}")
   printf '%s' "${target:-$VERSION}"
 }
 
-die() { echo "multiplayr: $*" >&2; exit 1; }
-token() { cat "$TOKEN_FILE" 2>/dev/null || die "not signed in, run: multiplayr login"; }
+die() { echo "weclaude: $*" >&2; exit 1; }
+token() { cat "$TOKEN_FILE" 2>/dev/null || die "not signed in, run: weclaude login"; }
 json_escape() { local s=${1//\\/\\\\}; s=${s//\"/\\\"}; s=${s//$'\t'/\\t}; s=${s//$'\r'/}; printf '%s' "${s//$'\n'/\\n}"; }
 json_field() { sed -nE "s/.*\"$1\" *: *\"([^\"]*)\".*/\1/p"; }
 
@@ -49,14 +49,14 @@ api() {
   local method=$1 path=$2; shift 2
   local out status bearer
   bearer=$(token) || exit 1
-  out=$(curl -sS -X "$method" -w '\n%{http_code}' -H "Authorization: Bearer $bearer" -H "X-Multiplayr-Session: $SESSION" -H "X-Multiplayr-Version: $(client_version)" "$@" "$SERVER$path") || die "server unreachable"
+  out=$(curl -sS -X "$method" -w '\n%{http_code}' -H "Authorization: Bearer $bearer" -H "X-Weclaude-Session: $SESSION" -H "X-Weclaude-Version: $(client_version)" "$@" "$SERVER$path") || die "server unreachable"
   status=${out##*$'\n'}
   out=${out%$'\n'*}
   [[ $status == 2* ]] || die "$out"
   printf '%s\n' "$out"
 }
 
-need_session() { [[ -n $SESSION ]] || die "no session id (set MULTIPLAYR_SESSION)"; }
+need_session() { [[ -n $SESSION ]] || die "no session id (set WECLAUDE_SESSION)"; }
 
 # Revokes this machine's token on the server, when it has one.
 revoke_token() {
@@ -96,10 +96,10 @@ default_name() {
 
 cmd_join() {
   need_session
-  local project=${1:?usage: multiplayr join <project> [name]}
-  local name=${2:-${MULTIPLAYR_NAME:-$(default_name)}}
+  local project=${1:?usage: weclaude join <project> [name]}
+  local name=${2:-${WECLAUDE_NAME:-$(default_name)}}
   api POST /api/agent/join -H 'content-type: application/json' \
-    -d "{\"project\":\"$(json_escape "$project")\",\"name\":\"$(json_escape "$name")\",\"platform\":\"$PLATFORM\",\"model\":\"$(json_escape "${MULTIPLAYR_MODEL:-}")\"}"
+    -d "{\"project\":\"$(json_escape "$project")\",\"name\":\"$(json_escape "$name")\",\"platform\":\"$PLATFORM\",\"model\":\"$(json_escape "${WECLAUDE_MODEL:-}")\"}"
   [[ $PLATFORM == CODEX ]] && start_relay
   mkdir -p "$STATE_DIR" && touch "$STATE_DIR/joined-$SESSION"
   return 0
@@ -107,20 +107,20 @@ cmd_join() {
 
 cmd_topic() {
   need_session
-  api POST /api/agent/topic -H 'content-type: application/json' -d "{\"topic\":\"$(json_escape "${1:?usage: multiplayr topic <topic>}")\"}"
+  api POST /api/agent/topic -H 'content-type: application/json' -d "{\"topic\":\"$(json_escape "${1:?usage: weclaude topic <topic>}")\"}"
 }
 
 # Leaves one topic. Leaving the whole project needs --project, which an agent runs only after its owner confirms.
 cmd_leave() {
   need_session
-  local topic=${1:?usage: multiplayr leave <topic> | leave --project}
+  local topic=${1:?usage: weclaude leave <topic> | leave --project}
   [[ $topic == --project ]] && topic=
   api POST /api/agent/leave -H 'content-type: application/json' -d "{\"topic\":\"$(json_escape "$topic")\"}"
 }
 
 cmd_rename() {
   need_session
-  api POST /api/agent/rename -H 'content-type: application/json' -d "{\"name\":\"$(json_escape "${1:?usage: multiplayr rename <name>}")\"}"
+  api POST /api/agent/rename -H 'content-type: application/json' -d "{\"name\":\"$(json_escape "${1:?usage: weclaude rename <name>}")\"}"
 }
 
 # Calls one MCP tool and prints its text.
@@ -134,13 +134,13 @@ cmd_status() { need_session; call_tool status; }
 
 cmd_upload() {
   need_session
-  local topic=${1:?usage: multiplayr upload <topic> <file> [text]} file=${2:?usage: multiplayr upload <topic> <file> [text]}
+  local topic=${1:?usage: weclaude upload <topic> <file> [text]} file=${2:?usage: weclaude upload <topic> <file> [text]}
   [[ -f $file ]] || die "no file $file"
   api POST /api/agent/upload -F "topic=$topic" -F "file=@$file" -F "text=${3:-}"
 }
 
 cmd_download() {
-  local id=${1:?usage: multiplayr download <file id> <path>} dest=${2:?usage: multiplayr download <file id> <path>}
+  local id=${1:?usage: weclaude download <file id> <path>} dest=${2:?usage: weclaude download <file id> <path>}
   curl -sSf -H "Authorization: Bearer $(token)" -o "$dest" "$SERVER/api/files/$id" || die "download failed"
   echo "saved $dest"
 }
@@ -157,7 +157,7 @@ cmd_watch() {
         data:*) echo "${line#data: }"; [[ $once == --once ]] && { kill "$!" 2>/dev/null; exit 0; } ;;
         status:*) status=${line#status:} ;;
       esac
-    done < <(curl -sN -w '\nstatus:%{http_code}\n' -H "Authorization: Bearer $(cat "$TOKEN_FILE" 2>/dev/null)" -H "X-Multiplayr-Session: $SESSION" -H "X-Multiplayr-Version: $VERSION" "$SERVER/api/agent/watch")
+    done < <(curl -sN -w '\nstatus:%{http_code}\n' -H "Authorization: Bearer $(cat "$TOKEN_FILE" 2>/dev/null)" -H "X-Weclaude-Session: $SESSION" -H "X-Weclaude-Version: $VERSION" "$SERVER/api/agent/watch")
     [[ $status == 204 || $status == 4* ]] && exit 0
     sleep "$RECONNECT_S"
   done
@@ -195,11 +195,11 @@ hook_notes() {
   rules=$(cat "$STATE_DIR/rules-$SESSION" 2>/dev/null)
   rules=${rules:-$start}
   if newer "$VERSION" "$rules"; then
-    context="Multiplayr updated to $VERSION. Follow these rules from now on:"$'\n\n'"$(cat "$PLUGIN_ROOT/instructions.md")"
+    context="Weclaude updated to $VERSION. Follow these rules from now on:"$'\n\n'"$(cat "$PLUGIN_ROOT/instructions.md")"
     printf '%s' "$VERSION" >"$STATE_DIR/rules-$SESSION"
   fi
   if [[ $event == UserPromptSubmit ]] && newer "$HOOKS_VERSION" "$start"; then
-    message="Multiplayr $VERSION needs newer hooks than this session loaded (${start:-before 0.4.18}). Restart this session to load them: exit, then run claude --resume."
+    message="Weclaude $VERSION needs newer hooks than this session loaded (${start:-before 0.4.18}). Restart this session to load them: exit, then run claude --resume."
   fi
   [[ -n $context || -n $message ]] || return 0
   local out="{"
@@ -236,7 +236,7 @@ cmd_state() {
   case $(json_field notification_type <<<"$input") in
     permission_prompt|elicitation_dialog) body="{\"state\":\"$state\",\"approval\":\"$(json_escape "$(json_field message <<<"$input")")\"}" ;;
   esac
-  curl -sS -m 3 -o /dev/null -X POST -H 'content-type: application/json' -H "Authorization: Bearer $(cat "$TOKEN_FILE")" -H "X-Multiplayr-Session: $SESSION" -H "X-Multiplayr-Version: $(client_version)" --data "$body" "$SERVER/api/agent/state" 2>/dev/null || true
+  curl -sS -m 3 -o /dev/null -X POST -H 'content-type: application/json' -H "Authorization: Bearer $(cat "$TOKEN_FILE")" -H "X-Weclaude-Session: $SESSION" -H "X-Weclaude-Version: $(client_version)" --data "$body" "$SERVER/api/agent/state" 2>/dev/null || true
 }
 
 # Stdio MCP server: forwards each JSON-RPC line to the server with this device's token and session id.
@@ -247,13 +247,13 @@ cmd_mcp() {
     [[ -n $session ]] || session=$(cat "$STATE_DIR/host-$(host_pid).session" 2>/dev/null)
     id=$(sed -nE 's/.*"id" *: *([0-9]+|"[^"]*").*/\1/p' <<<"$line")
     reply=$(curl -sS -X POST -H 'content-type: application/json' -H "Authorization: Bearer $(cat "$TOKEN_FILE" 2>/dev/null)" \
-      -H "X-Multiplayr-Session: $session" -H "X-Multiplayr-Version: $(client_version)" --data-binary "$line" "$SERVER/api/mcp" 2>/dev/null)
+      -H "X-Weclaude-Session: $session" -H "X-Weclaude-Version: $(client_version)" --data-binary "$line" "$SERVER/api/mcp" 2>/dev/null)
     if [[ $reply == \{* ]]; then
       printf '%s\n' "$reply"
     elif [[ -n $id ]]; then
       local message
       message=$(json_escape "${reply:-server unreachable}")
-      printf '{"jsonrpc":"2.0","id":%s,"error":{"code":-32000,"message":"multiplayr: %s"}}\n' "$id" "$message"
+      printf '{"jsonrpc":"2.0","id":%s,"error":{"code":-32000,"message":"weclaude: %s"}}\n' "$id" "$message"
     fi
   done
 }
@@ -290,7 +290,7 @@ start_relay() {
   mkdir -p "$STATE_DIR"
   kill -0 "$(cat "$pidfile" 2>/dev/null)" 2>/dev/null && return
   local detach=; command -v setsid >/dev/null && detach=setsid
-  MULTIPLAYR_SESSION=$SESSION $detach "$0" relay </dev/null >/dev/null 2>&1 &
+  WECLAUDE_SESSION=$SESSION $detach "$0" relay </dev/null >/dev/null 2>&1 &
   echo $! >"$pidfile"
 }
 
@@ -298,10 +298,10 @@ start_relay() {
 installed_root() {
   local cache
   case $PLATFORM in
-    CLAUDE_CODE) cache="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/cache/multiplayr/multiplayr" ;;
-    CODEX) cache="${CODEX_HOME:-$HOME/.codex}/plugins/cache/multiplayr/multiplayr" ;;
+    CLAUDE_CODE) cache="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/cache/weclaude/weclaude" ;;
+    CODEX) cache="${CODEX_HOME:-$HOME/.codex}/plugins/cache/weclaude/weclaude" ;;
     ANTIGRAVITY)
-      local dir="${GEMINI_CONFIG_DIR:-$HOME/.gemini/config}/plugins/multiplayr"
+      local dir="${GEMINI_CONFIG_DIR:-$HOME/.gemini/config}/plugins/weclaude"
       [[ -d $dir ]] && printf '%s' "$dir"
       return ;;
     *) return ;;
@@ -314,8 +314,8 @@ installed_root() {
 # The newest installed version across the platforms' caches, or nothing.
 newest_install() {
   local dir version best= best_version=
-  for dir in "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/plugins/cache/multiplayr/multiplayr/*/ "${CODEX_HOME:-$HOME/.codex}"/plugins/cache/multiplayr/multiplayr/*/ "${GEMINI_CONFIG_DIR:-$HOME/.gemini/config}"/plugins/multiplayr/; do
-    [[ -x ${dir}bin/multiplayr ]] || continue
+  for dir in "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/plugins/cache/weclaude/weclaude/*/ "${CODEX_HOME:-$HOME/.codex}"/plugins/cache/weclaude/weclaude/*/ "${GEMINI_CONFIG_DIR:-$HOME/.gemini/config}"/plugins/weclaude/; do
+    [[ -x ${dir}bin/weclaude ]] || continue
     version=$(plugin_version "${dir%/}")
     if [[ -z $best ]] || [[ $version != "$best_version" && $(printf '%s\n%s\n' "$best_version" "$version" | sort -V | tail -1) == "$version" ]]; then
       best=${dir%/}
@@ -325,13 +325,13 @@ newest_install() {
   printf '%s' "$best"
 }
 
-# Points multiplayr on PATH at the newest installed version, or at the given root when none is installed. The hooks run that link.
+# Points weclaude on PATH at the newest installed version, or at the given root when none is installed. The hooks run that link.
 link_newest() {
-  local target link="$HOME/.local/bin/multiplayr"
+  local target link="$HOME/.local/bin/weclaude"
   target=$(newest_install)
   [[ -n $target ]] || target=$1
-  [[ -x $target/bin/multiplayr ]] || return 0
-  mkdir -p "$HOME/.local/bin" && ln -s "$target/bin/multiplayr" "$link.$$" && mv -Tf "$link.$$" "$link"
+  [[ -x $target/bin/weclaude ]] || return 0
+  mkdir -p "$HOME/.local/bin" && ln -s "$target/bin/weclaude" "$link.$$" && mv -Tf "$link.$$" "$link"
 }
 
 # Downloads the latest published Antigravity plugin folder and installs it with agy.
@@ -340,19 +340,19 @@ update_antigravity() {
   agy=$(command -v agy 2>/dev/null || echo "$HOME/.local/bin/agy")
   [[ -x $agy ]] || return 1
   tmp=$(mktemp -d) || return 1
-  curl -sSfL https://github.com/A-Eugene/multiplayr/archive/refs/heads/main.tar.gz | tar -xz -C "$tmp" &&
-    "$agy" plugin install "$tmp/multiplayr-main/platforms/antigravity" >/dev/null
+  curl -sSfL https://weclaude.ucyenyen.dev/release/weclaude-main.tar.gz | tar -xz -C "$tmp" &&
+    "$agy" plugin install "$tmp/weclaude-main/platforms/antigravity" >/dev/null
   rc=$?
   rm -rf "$tmp"
   return "$rc"
 }
 
-# Installs the published plugin now, points multiplayr on PATH at it, and prints its rules and this session's status.
+# Installs the published plugin now, points weclaude on PATH at it, and prints its rules and this session's status.
 # Hooks run from the version the session started with.
 cmd_reload() {
   case $PLATFORM in
-    CLAUDE_CODE) claude plugin marketplace update multiplayr >/dev/null && claude plugin update multiplayr@multiplayr >/dev/null || die "update failed" ;;
-    CODEX) codex plugin marketplace upgrade multiplayr >/dev/null && codex plugin add multiplayr@multiplayr >/dev/null || die "update failed" ;;
+    CLAUDE_CODE) claude plugin marketplace update weclaude >/dev/null && claude plugin update weclaude@weclaude >/dev/null || die "update failed" ;;
+    CODEX) codex plugin marketplace upgrade weclaude >/dev/null && codex plugin add weclaude@weclaude >/dev/null || die "update failed" ;;
     ANTIGRAVITY) update_antigravity || die "update failed" ;;
     *) die "unsupported platform $PLATFORM" ;;
   esac
@@ -363,10 +363,10 @@ cmd_reload() {
   [[ -n $SESSION ]] && mkdir -p "$STATE_DIR" && plugin_version "$root" >"$STATE_DIR/rules-$SESSION"
   cat "$root/instructions.md"
   echo
-  "$root/bin/multiplayr" status
+  "$root/bin/weclaude" status
 }
 
-# The installed version, the version this session's hooks run, and the rules version multiplayr reload loaded.
+# The installed version, the version this session's hooks run, and the rules version weclaude reload loaded.
 cmd_version() {
   local installed hooks rules
   installed=$(installed_root)
@@ -384,8 +384,8 @@ cmd_version() {
 self_update() {
   local root=$1 manifest update
   case $PLATFORM in
-    CLAUDE_CODE) manifest=claude-code/.claude-plugin/plugin.json; update='claude plugin marketplace update multiplayr && claude plugin update multiplayr@multiplayr' ;;
-    CODEX) manifest=codex/.codex-plugin/plugin.json; update='codex plugin marketplace upgrade multiplayr && codex plugin add multiplayr@multiplayr' ;;
+    CLAUDE_CODE) manifest=claude-code/.claude-plugin/plugin.json; update='claude plugin marketplace update weclaude && claude plugin update weclaude@weclaude' ;;
+    CODEX) manifest=codex/.codex-plugin/plugin.json; update='codex plugin marketplace upgrade weclaude && codex plugin add weclaude@weclaude' ;;
     ANTIGRAVITY) manifest=antigravity/plugin.json; update=update_antigravity ;;
     *) return ;;
   esac
@@ -445,7 +445,7 @@ case ${1:-} in
   leave) shift; cmd_leave "$@" ;;
   rename) shift; cmd_rename "$@" ;;
   status) cmd_status ;;
-  call) shift; need_session; args=${2:-}; [[ -n $args ]] || args='{}'; call_tool "${1:?usage: multiplayr call <tool> [json]}" "$args" ;;
+  call) shift; need_session; args=${2:-}; [[ -n $args ]] || args='{}'; call_tool "${1:?usage: weclaude call <tool> [json]}" "$args" ;;
   upload) shift; cmd_upload "$@" ;;
   download) shift; cmd_download "$@" ;;
   watch) cmd_watch ;;
@@ -459,5 +459,5 @@ case ${1:-} in
   hook) cat >/dev/null ;;
   reload) cmd_reload ;;
   version) cmd_version ;;
-  *) echo "usage: multiplayr login | logout | join <project> [name] | default-name | topic <topic> | leave <topic> | leave --project | rename <name> | status | call <tool> [json] | reload | version | hook <event> | upload <topic> <file> [text] | download <file id> <path> | watch | wait | listen | mcp | relay | session-start <plugin root>" >&2; exit 2 ;;
+  *) echo "usage: weclaude login | logout | join <project> [name] | default-name | topic <topic> | leave <topic> | leave --project | rename <name> | status | call <tool> [json] | reload | version | hook <event> | upload <topic> <file> [text] | download <file id> <path> | watch | wait | listen | mcp | relay | session-start <plugin root>" >&2; exit 2 ;;
 esac

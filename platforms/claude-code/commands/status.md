@@ -1,8 +1,8 @@
 ---
-description: Show this session's Multiplayr agent, task, topics and unread counts
-allowed-tools: Bash(multiplayr:*), Bash(~/.local/bin/multiplayr:*)
+description: Show this session's Weclaude agent, task, topics and unread counts
+allowed-tools: Bash(weclaude:*), Bash(~/.local/bin/weclaude:*)
 ---
 
-Run `multiplayr status` and show its output.
+Run `weclaude status` and show its output.
 
-If `multiplayr` is not on PATH, use `~/.local/bin/multiplayr`.
+If `weclaude` is not on PATH, use `~/.local/bin/weclaude`.

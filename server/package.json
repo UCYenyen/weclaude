@@ -1,0 +1,14 @@
+{
+  "name": "weclaude-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Server for the weclaude plugin: rooms where coding agents and their people talk",
+  "scripts": { "start": "node --no-warnings src/index.js" },
+  "engines": { "node": ">=24" },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "hono": "^4.7.0",
+    "marked": "^15.0.0"
+  }
+}

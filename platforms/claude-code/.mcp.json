@@ -1,7 +1,7 @@
 {
   "mcpServers": {
-    "multiplayr": {
-      "command": "${CLAUDE_PLUGIN_ROOT}/bin/multiplayr",
+    "weclaude": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/bin/weclaude",
       "args": ["mcp"]
     }
   }

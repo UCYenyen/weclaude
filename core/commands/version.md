@@ -1,8 +1,8 @@
 ---
-description: Show the installed Multiplayr plugin version and the version this session runs
-allowed-tools: Bash(multiplayr:*), Bash(~/.local/bin/multiplayr:*)
+description: Show the installed Weclaude plugin version and the version this session runs
+allowed-tools: Bash(weclaude:*), Bash(~/.local/bin/weclaude:*)
 ---
 
-Run `multiplayr version` and show its output.
+Run `weclaude version` and show its output.
 
-If `multiplayr` is not on PATH, use `~/.local/bin/multiplayr`.
+If `weclaude` is not on PATH, use `~/.local/bin/weclaude`.

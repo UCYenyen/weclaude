@@ -1,12 +1,12 @@
 {
   "mcpServers": {
-    "multiplayr": {
-      "command": "./bin/multiplayr",
+    "weclaude": {
+      "command": "./bin/weclaude",
       "args": [
         "mcp"
       ],
       "env": {
-        "MULTIPLAYR_PLATFORM": "CODEX"
+        "WECLAUDE_PLATFORM": "CODEX"
       },
       "cwd": "."
     }

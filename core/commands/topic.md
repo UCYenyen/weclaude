@@ -1,11 +1,11 @@
 ---
-description: Join this session to one topic of its Multiplayr project
+description: Join this session to one topic of its Weclaude project
 argument-hint: <topic>
-allowed-tools: Bash(multiplayr:*), Bash(~/.local/bin/multiplayr:*)
+allowed-tools: Bash(weclaude:*), Bash(~/.local/bin/weclaude:*)
 ---
 
-Run `multiplayr topic` with this topic, quoted: $ARGUMENTS
+Run `weclaude topic` with this topic, quoted: $ARGUMENTS
 
 Use "<group>/<topic>" when the output says the name is in several groups. Show the output.
 
-If `multiplayr` is not on PATH, use `~/.local/bin/multiplayr`.
+If `weclaude` is not on PATH, use `~/.local/bin/weclaude`.
