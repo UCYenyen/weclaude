@@ -11,6 +11,7 @@ import { approveDevice, saveUpload } from './agent-api.js';
 export const web = new Hono();
 const SECURE = (process.env.PUBLIC_URL || '').startsWith('https://');
 const SIGNUP_CODE = process.env.SIGNUP_CODE || '';
+const V = Date.now().toString(36); // busts browser caches of app.js/app.css on each deploy
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
 
@@ -35,8 +36,8 @@ export function renderMarkdown(src) {
 }
 
 // ---------- pages ----------
-const page = (title, body, user) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(title)} · weclaude</title><link rel="stylesheet" href="/static/app.css"><link rel="icon" href="/static/icon.svg"></head>
+const page = (title, body, user) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#faf9f7">
+<title>${esc(title)} · weclaude</title><link rel="stylesheet" href="/static/app.css?v=${V}"><link rel="icon" href="/static/icon.svg"></head>
 <body class="page"><header class="top"><a class="brand" href="/">weclaude</a>${user ? `<nav><a href="/settings">${esc(user.username)}</a><form method="post" action="/logout"><button class="link">Sign out</button></form></nav>` : ''}</header>
 <main class="narrow">${body}</main></body></html>`;
 
@@ -127,10 +128,10 @@ web.get('/p/:name', (c) => {
   if (!u) return needLogin(c);
   const p = get('SELECT * FROM projects WHERE name=?', c.req.param('name'));
   if (!p || !isMember(p.id, u.id)) return c.html(page('Not found', '<h1>No such project</h1><p>It does not exist, or you are not a member. <a href="/">Back</a></p>', u), 404);
-  return c.html(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(p.name)} · weclaude</title><link rel="stylesheet" href="/static/app.css"><link rel="icon" href="/static/icon.svg"></head>
+  return c.html(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#faf9f7">
+<title>${esc(p.name)} · weclaude</title><link rel="stylesheet" href="/static/app.css?v=${V}"><link rel="icon" href="/static/icon.svg"></head>
 <body class="app" data-project="${p.id}" data-me="${esc(u.username)}"><div id="root"><p class="muted" style="padding:2rem">Loading…</p></div>
-<script src="/static/app.js" type="module"></script></body></html>`);
+<script src="/static/app.js?v=${V}" type="module"></script></body></html>`);
 });
 
 web.get('/device', (c) => {
@@ -443,6 +444,7 @@ japi.get('/p/:pid/stream', (c) => {
   if (!p) return bad(c, 'No such project', 404);
   const u = c.get('user');
   c.header('X-Accel-Buffering', 'no');
+  c.header('Cache-Control', 'no-cache, no-transform');
   return streamSSE(c, async (s) => {
     let closed = false;
     const send = (ev) => { if (!closed) s.writeSSE({ data: JSON.stringify(ev) }).catch(() => { closed = true; }); };
@@ -450,7 +452,9 @@ japi.get('/p/:pid/stream', (c) => {
     bus.on(`user:${u.id}`, send);
     s.onAbort(() => { closed = true; });
     try {
-      while (!closed) { await s.sleep(20000); if (!closed) await s.writeSSE({ event: 'ping', data: '' }).catch(() => { closed = true; }); }
+      // A first ping right away lets the browser know the stream is open; later ones keep proxies and phones from idling it out.
+      await s.writeSSE({ event: 'ping', data: '', retry: 3000 }).catch(() => { closed = true; });
+      while (!closed) { await s.sleep(15000); if (!closed) await s.writeSSE({ event: 'ping', data: '' }).catch(() => { closed = true; }); }
     } finally {
       bus.off(`project:${p.id}`, send);
       bus.off(`user:${u.id}`, send);
